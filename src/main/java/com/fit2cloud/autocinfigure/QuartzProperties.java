@@ -1,7 +1,9 @@
 package com.fit2cloud.autocinfigure;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
-@ConfigurationProperties("example.service")
-public class ExampleServiceProperties {
+
+@ConfigurationProperties("quartz")
+public class QuartzProperties {
     private String prefix;
     private String suffix;
 

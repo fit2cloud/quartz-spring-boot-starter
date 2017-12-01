@@ -1,11 +1,11 @@
 package com.fit2cloud.autocinfigure;
 
-public class ExampleService {
+public class QuartzConfigService {
 
     private String prefix;
     private String suffix;
 
-    public ExampleService(String prefix, String suffix) {
+    public QuartzConfigService(String prefix, String suffix) {
         this.prefix = prefix;
         this.suffix = suffix;
     }

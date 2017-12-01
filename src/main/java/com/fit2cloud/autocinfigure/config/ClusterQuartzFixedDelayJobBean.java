@@ -1,12 +1,12 @@
 package com.fit2cloud.autocinfigure.config;
 
 
-import com.zwzx.common.spring.CommonBeanFactory;
-import com.zwzx.common.utils.LogUtil;
+import com.fit2cloud.autocinfigure.util.CommonBeanFactory;
 import org.quartz.DisallowConcurrentExecution;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.PersistJobDataAfterExecution;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 
 import java.lang.reflect.Method;
@@ -19,21 +19,21 @@ import java.lang.reflect.Method;
 @PersistJobDataAfterExecution
 @DisallowConcurrentExecution
 public class ClusterQuartzFixedDelayJobBean extends QuartzJobBean {
-
+    private Logger logger = LoggerFactory.getLogger(ClusterQuartzJobBean.class);
     private String targetObject;
 
     private String targetMethod;
 
     @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+    protected void executeInternal(JobExecutionContext context) {
         try {
-            LogUtil.info("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
+            logger.info("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
             Object targetObject = CommonBeanFactory.getBean(this.targetObject);
             Method m = targetObject.getClass().getMethod(targetMethod);
             m.invoke(targetObject);
-            LogUtil.info("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);
+            logger.info("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);
         } catch (final Exception e) {
-            LogUtil.error("定时任务执行失败：targetObject={}, targetMethod={}", targetObject, targetMethod);
+            logger.error("定时任务执行失败：targetObject={}, targetMethod={}", targetObject, targetMethod);
         }
     }
 

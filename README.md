@@ -30,7 +30,6 @@
     ```properties
         # quartz enabled
         quartz.enabled=true # 是否开启quartz
-        quartz.data-source=dataSource # 定时任务使用哪一个数据源
         quartz.scheduler-name=testScheduler # 集群定时任务的唯一标识
     ```
 - 工程中代码只需要在 `public method` 中加上指定注解即可

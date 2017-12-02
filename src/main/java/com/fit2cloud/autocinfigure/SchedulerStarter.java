@@ -6,7 +6,6 @@ import com.fit2cloud.autocinfigure.config.ClusterQuartzFixedDelayJobBean;
 import com.fit2cloud.autocinfigure.config.ClusterQuartzJobBean;
 import com.fit2cloud.autocinfigure.config.FixdedDelayJobData;
 import com.fit2cloud.autocinfigure.config.FixedDelayJobListener;
-import com.zwzx.common.spring.PropertiesConfigurer;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.quartz.*;
@@ -15,6 +14,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -50,6 +50,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     private Scheduler scheduler;
 
     private Map<JobDetail, Trigger> jobDetailTriggerMap = new HashMap<>();
+    private ConfigurableApplicationContext applicationContext;
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -107,7 +108,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     private String getCronExpression(String cron) {
         cron = cron.trim();
         if (StringUtils.startsWith(cron, "${") && StringUtils.endsWith(cron, "}")) {
-            cron = PropertiesConfigurer.getProperty(StringUtils.substringBetween(cron, "${", "}"));
+            return applicationContext.getBeanFactory().resolveEmbeddedValue(cron);
         }
         return cron;
     }
@@ -176,5 +177,6 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         now = DateTime.now();
+        this.applicationContext = (ConfigurableApplicationContext) applicationContext;
     }
 }

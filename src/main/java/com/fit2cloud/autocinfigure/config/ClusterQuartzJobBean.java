@@ -1,7 +1,7 @@
 package com.fit2cloud.autocinfigure.config;
 
 
-import com.fit2cloud.autocinfigure.util.CommonBeanFactory;
+import com.fit2cloud.autocinfigure.util.QuartzBeanFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ public class ClusterQuartzJobBean extends QuartzJobBean {
     protected void executeInternal(JobExecutionContext context) {
         try {
             logger.info("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
-            Object targetObject = CommonBeanFactory.getBean(this.targetObject);
+            Object targetObject = QuartzBeanFactory.getBean(this.targetObject);
             Method m = targetObject.getClass().getMethod(targetMethod);
             m.invoke(targetObject);
             logger.info("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);

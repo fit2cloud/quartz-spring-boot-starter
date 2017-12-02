@@ -1,5 +1,6 @@
 package com.fit2cloud.autocinfigure;
 
+import com.fit2cloud.autocinfigure.util.QuartzBeanFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -31,6 +32,13 @@ public class QuartzAutoConfiguration {
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
     public SchedulerStarter schedulerStarter() {
         return new SchedulerStarter();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
+    public QuartzBeanFactory quartzBeanFactory() {
+        return new QuartzBeanFactory();
     }
 
 

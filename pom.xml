@@ -28,7 +28,7 @@
             <exclusions>
                 <exclusion>
                     <artifactId>c3p0</artifactId>
-                    <groupId>c3p0</groupId>
+                    <groupId>com.mchange</groupId>
                 </exclusion>
             </exclusions>
         </dependency>

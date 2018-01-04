@@ -49,7 +49,8 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     @Resource
     private Scheduler scheduler;
 
-    private Map<JobDetail, Trigger> jobDetailTriggerMap = new HashMap<>();
+    private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
+
     private ConfigurableApplicationContext applicationContext;
 
     @Override
@@ -71,13 +72,14 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                     long fixedDelay = annotation.fixedDelay();
                     long fixedRate = annotation.fixedRate();
                     int initialDelay = (int) annotation.initialDelay();
-                    JobDetail jobDetail;
-                    Trigger trigger;
+                    final JobDetail jobDetail;
+                    final Trigger trigger;
+                    String jobDetailIdentity = beanName + "." + method.getName();
                     if (StringUtils.isNotBlank(cron)) {
                         cron = getCronExpression(cron);
                         jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
-                        trigger = TriggerBuilder.newTrigger().withIdentity(beanName + "." + method.getName())
+                        trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
                                 .startAt(now.plusMillis(initialDelay).toDate())
                                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                                 .build();
@@ -85,20 +87,20 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixdedDelayJobData(fixedDelay));
                         jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
-                        trigger = TriggerBuilder.newTrigger().withIdentity(beanName + "." + method.getName())
+                        trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
                                 .startAt(now.plusMillis(initialDelay).toDate())
                                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(fixedDelay).repeatForever())
                                 .build();
                     } else {
                         jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
-                        trigger = TriggerBuilder.newTrigger().withIdentity(beanName + "." + method.getName())
+                        trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
                                 .startAt(now.plusMillis(initialDelay).toDate())
                                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                                         .withIntervalInMilliseconds(fixedRate).repeatForever())
                                 .build();
                     }
-                    jobDetailTriggerMap.put(jobDetail, trigger);
+                    jobDetailTriggerMap.put(jobDetailIdentity, new JobDetailTrigger(jobDetail, trigger));
                 }
             }
         }
@@ -125,9 +127,9 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
             scheduler.deleteJobs(getJobKeys());
             scheduler.unscheduleJobs(getTriggerKeys());
             scheduler.getListenerManager().addJobListener(new FixedDelayJobListener());
-            for (JobDetail jobDetail : jobDetailTriggerMap.keySet()) {
-                Trigger trigger = jobDetailTriggerMap.get(jobDetail);
-                scheduler.scheduleJob(jobDetail, trigger);
+            for (String jobDetailIdentity : jobDetailTriggerMap.keySet()) {
+                JobDetailTrigger jobDetailTrigger = this.jobDetailTriggerMap.get(jobDetailIdentity);
+                scheduler.scheduleJob(jobDetailTrigger.jobDetail, jobDetailTrigger.trigger);
             }
             if (!scheduler.isShutdown()) {
                 scheduler.startDelayed(60); // 60 秒之后开始执行定时任务, 不能删除
@@ -178,5 +180,15 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         now = DateTime.now();
         this.applicationContext = (ConfigurableApplicationContext) applicationContext;
+    }
+
+    private static class JobDetailTrigger {
+        JobDetail jobDetail;
+        Trigger trigger;
+
+        JobDetailTrigger(JobDetail jobDetail, Trigger trigger) {
+            this.jobDetail = jobDetail;
+            this.trigger = trigger;
+        }
     }
 }

@@ -4,18 +4,18 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public final class FixdedDelayJobData implements Serializable {
+public final class FixedDelayJobData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private long delay;
     private TimeUnit delayUnit;
 
-    public FixdedDelayJobData(long delay) {
+    public FixedDelayJobData(long delay) {
         this(delay, TimeUnit.MILLISECONDS);
     }
 
-    public FixdedDelayJobData(long delay, final TimeUnit delayUnit) {
+    public FixedDelayJobData(long delay, final TimeUnit delayUnit) {
         if (delay == 0) {
             throw new IllegalArgumentException("Delay cannot be zero");
         }
@@ -32,6 +32,6 @@ public final class FixdedDelayJobData implements Serializable {
 
     @Override
     public String toString() {
-        return "FixdedDelayJobData [delay=" + delay + ", delayUnit=" + delayUnit + "]";
+        return "FixedDelayJobData [delay=" + delay + ", delayUnit=" + delayUnit + "]";
     }
 }

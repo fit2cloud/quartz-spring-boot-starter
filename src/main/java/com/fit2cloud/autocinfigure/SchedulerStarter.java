@@ -4,7 +4,7 @@ package com.fit2cloud.autocinfigure;
 import com.fit2cloud.autocinfigure.anno.F2CScheduled;
 import com.fit2cloud.autocinfigure.config.ClusterQuartzFixedDelayJobBean;
 import com.fit2cloud.autocinfigure.config.ClusterQuartzJobBean;
-import com.fit2cloud.autocinfigure.config.FixdedDelayJobData;
+import com.fit2cloud.autocinfigure.config.FixedDelayJobData;
 import com.fit2cloud.autocinfigure.config.FixedDelayJobListener;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -84,7 +84,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                                 .build();
                     } else if (fixedDelay > 0) {
-                        jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixdedDelayJobData(fixedDelay));
+                        jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(fixedDelay));
                         jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
                         trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)

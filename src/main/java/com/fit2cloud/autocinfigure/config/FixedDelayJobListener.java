@@ -18,7 +18,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
  *
  *		JobDataMap map = context.getJobDetail().getJobDataMap();
  *
- *		map.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixdedDelayJobData(2L));
+ *		map.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(2L));
  *                // Perform the job operation
  *		:
  *		:
@@ -71,7 +71,7 @@ public final class FixedDelayJobListener extends JobListenerSupport {
         }
 
         TriggerKey oldTriggerKey = context.getTrigger().getKey();
-        FixdedDelayJobData jobData = (FixdedDelayJobData) data.getWrappedMap().get(FIXED_DELAY_JOB_DATA);
+        FixedDelayJobData jobData = (FixedDelayJobData) data.getWrappedMap().get(FIXED_DELAY_JOB_DATA);
         Trigger newTrigger = buildNewTrigger(jobData, oldTriggerKey);
 
         rescheduleJob(context.getScheduler(), oldTriggerKey, newTrigger);
@@ -98,7 +98,7 @@ public final class FixedDelayJobListener extends JobListenerSupport {
         return triggersOfJob;
     }
 
-    private Trigger buildNewTrigger(final FixdedDelayJobData jobData, final TriggerKey oldTriggerKey) {
+    private Trigger buildNewTrigger(final FixedDelayJobData jobData, final TriggerKey oldTriggerKey) {
         Date runTime = jobData.getNextScheduleDate();
         Trigger newTrigger = newTrigger().withIdentity(oldTriggerKey).startAt(runTime).build();
         return newTrigger;

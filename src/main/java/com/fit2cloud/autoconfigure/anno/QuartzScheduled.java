@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface F2CScheduled {
+public @interface QuartzScheduled {
 
     /**
      * A cron-like expression, extending the usual UN*X definition to include

@@ -1,7 +1,7 @@
 package com.fit2cloud.autoconfigure;
 
 
-import com.fit2cloud.autoconfigure.anno.F2CScheduled;
+import com.fit2cloud.autoconfigure.anno.QuartzScheduled;
 import com.fit2cloud.autoconfigure.config.ClusterQuartzFixedDelayJobBean;
 import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
 import com.fit2cloud.autoconfigure.config.FixedDelayJobData;
@@ -63,7 +63,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
         Method[] methods = ReflectionUtils.getAllDeclaredMethods(bean.getClass());
         if (methods != null) {
             for (Method method : methods) {
-                F2CScheduled annotation = AnnotationUtils.findAnnotation(method, F2CScheduled.class);
+                QuartzScheduled annotation = AnnotationUtils.findAnnotation(method, QuartzScheduled.class);
                 if (annotation != null) {
                     JobDataMap jobDataMap = new JobDataMap();
                     jobDataMap.put("targetObject", beanName);

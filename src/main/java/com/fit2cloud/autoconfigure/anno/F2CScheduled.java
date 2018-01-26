@@ -1,4 +1,4 @@
-package com.fit2cloud.autocinfigure.anno;
+package com.fit2cloud.autoconfigure.anno;
 
 import java.lang.annotation.*;
 

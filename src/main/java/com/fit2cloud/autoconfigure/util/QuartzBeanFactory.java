@@ -1,4 +1,4 @@
-package com.fit2cloud.autocinfigure.util;
+package com.fit2cloud.autoconfigure.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

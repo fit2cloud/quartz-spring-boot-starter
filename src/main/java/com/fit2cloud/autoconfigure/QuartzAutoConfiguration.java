@@ -1,6 +1,6 @@
-package com.fit2cloud.autocinfigure;
+package com.fit2cloud.autoconfigure;
 
-import com.fit2cloud.autocinfigure.util.QuartzBeanFactory;
+import com.fit2cloud.autoconfigure.util.QuartzBeanFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

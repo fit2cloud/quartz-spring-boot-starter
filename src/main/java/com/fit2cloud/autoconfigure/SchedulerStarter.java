@@ -1,11 +1,11 @@
-package com.fit2cloud.autocinfigure;
+package com.fit2cloud.autoconfigure;
 
 
-import com.fit2cloud.autocinfigure.anno.F2CScheduled;
-import com.fit2cloud.autocinfigure.config.ClusterQuartzFixedDelayJobBean;
-import com.fit2cloud.autocinfigure.config.ClusterQuartzJobBean;
-import com.fit2cloud.autocinfigure.config.FixedDelayJobData;
-import com.fit2cloud.autocinfigure.config.FixedDelayJobListener;
+import com.fit2cloud.autoconfigure.anno.F2CScheduled;
+import com.fit2cloud.autoconfigure.config.ClusterQuartzFixedDelayJobBean;
+import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
+import com.fit2cloud.autoconfigure.config.FixedDelayJobData;
+import com.fit2cloud.autoconfigure.config.FixedDelayJobListener;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.quartz.*;

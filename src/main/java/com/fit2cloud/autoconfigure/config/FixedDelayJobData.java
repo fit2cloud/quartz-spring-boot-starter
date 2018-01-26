@@ -1,4 +1,4 @@
-package com.fit2cloud.autocinfigure.config;
+package com.fit2cloud.autoconfigure.config;
 
 import java.io.Serializable;
 import java.util.Date;

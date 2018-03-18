@@ -2,9 +2,6 @@ package com.fit2cloud.autoconfigure.anno;
 
 import java.lang.annotation.*;
 
-/**
- * Every task is delayed by 60 seconds by default if <code>initialDelay</code> not set.
- */
 @Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

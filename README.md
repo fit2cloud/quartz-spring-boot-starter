@@ -18,7 +18,8 @@
 
 ## 日常使用
 - 工程必须是spring boot 工程否则无法使用。
-- 将下面的代码复制到`POM`文件中指定的位置
+- 集群定时任务启动需要web容器和数据库的支持，各个数据库的`DDL`请自行下载[http://www.quartz-scheduler.org/downloads/](http://www.quartz-scheduler.org/downloads/) 使用时请注意表名大小写的问题。
+- 将下面的代码复制到`POM`文件中指定的位置。
 ```xml
 <dependency>
   <groupId>com.fit2cloud</groupId>

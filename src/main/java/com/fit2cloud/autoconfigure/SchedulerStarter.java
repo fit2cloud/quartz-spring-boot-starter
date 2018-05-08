@@ -7,7 +7,6 @@ import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
 import com.fit2cloud.autoconfigure.config.FixedDelayJobData;
 import com.fit2cloud.autoconfigure.config.FixedDelayJobListener;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.BeansException;
@@ -22,10 +21,8 @@ import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * 这里必须用 ApplicationContextAware,
@@ -45,7 +42,7 @@ import java.util.Map;
  * </pre>
  */
 public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAware {
-    private DateTime now;
+    private Instant now;
     @Resource
     private Scheduler scheduler;
 
@@ -80,7 +77,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
                         trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
-                                .startAt(now.plusMillis(initialDelay).toDate())
+                                .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                                 .build();
                     } else if (fixedDelay > 0) {
@@ -88,14 +85,14 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
                         trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
-                                .startAt(now.plusMillis(initialDelay).toDate())
+                                .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(fixedDelay).repeatForever())
                                 .build();
                     } else {
                         jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
                         trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
-                                .startAt(now.plusMillis(initialDelay).toDate())
+                                .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                                 .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                                         .withIntervalInMilliseconds(fixedRate).repeatForever())
                                 .build();
@@ -178,7 +175,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
      */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        now = DateTime.now();
+        now = Instant.now();
         this.applicationContext = (ConfigurableApplicationContext) applicationContext;
     }
 

@@ -24,7 +24,7 @@
 <dependency>
   <groupId>com.fit2cloud</groupId>
   <artifactId>quartz-spring-boot-starter</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 </dependency>
 ```
 - 工程启动的配置文件`application.properties`中有定时任务的详细设置
@@ -65,3 +65,4 @@ public class CustomDemoJob {
 
 ## 注意事项
 - 本工程版本 `0.0.2` 版本修改了注解的名称和包路径，使用时请对照版本操作
+- 本工程版本 `0.0.3` 版本基于JDK8编写，使用时请对照版本操作

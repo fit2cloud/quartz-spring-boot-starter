@@ -6,7 +6,6 @@ import com.fit2cloud.autoconfigure.config.ClusterQuartzFixedDelayJobBean;
 import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
 import com.fit2cloud.autoconfigure.config.FixedDelayJobData;
 import com.fit2cloud.autoconfigure.config.FixedDelayJobListener;
-import org.apache.commons.lang3.StringUtils;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.BeansException;
@@ -18,6 +17,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
@@ -72,7 +72,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                     final JobDetail jobDetail;
                     final Trigger trigger;
                     String jobDetailIdentity = beanName + "." + method.getName();
-                    if (StringUtils.isNotBlank(cron)) {
+                    if (!StringUtils.isEmpty(cron)) {
                         cron = getCronExpression(cron);
                         jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                                 .storeDurably(true).usingJobData(jobDataMap).build();
@@ -106,7 +106,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
 
     private String getCronExpression(String cron) {
         cron = cron.trim();
-        if (StringUtils.startsWith(cron, "${") && StringUtils.endsWith(cron, "}")) {
+        if (cron.startsWith("${") && cron.endsWith("}")) {
             return applicationContext.getBeanFactory().resolveEmbeddedValue(cron);
         }
         return cron;

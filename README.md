@@ -60,9 +60,33 @@ public class CustomDemoJob {
         Thread.sleep(10 * 1000);
         System.out.println(Thread.currentThread() + "fixedRateJob end " + new Date());   
     }
+    /**
+    * 动态调整的定时任务
+    * @param a 自定义参数 必须是包装类型
+    * @param b 自定义参数 必须是包装类型
+    */
+    public void task1(Integer a, Integer b) {
+        System.out.println(a + b); 
+    }
 }
+```
+- 测试动态调整的定时任务
+```java
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class TestQuartzManageService {
+    @Resource
+    private QuartzManageService quartzManageService;
+
+    @Test
+    public void test1() throws Exception {
+        quartzManageService.addJob("commonJob", "task1", "1/5 * * * * ?", 3, 5);
+        Thread.sleep(1000 * 1000);
+    }
+}
+
 ``` 
 
 ## 注意事项
 - 本工程版本 `0.0.2` 版本修改了注解的名称和包路径，使用时请对照版本操作
-- 本工程版本 `0.0.3` 版本基于JDK8编写，使用时请对照版本操作
+- 本工程版本 `0.0.3` 版本基于JDK8编写，支持动态调整定时任务并指定参数执行，使用时请对照版本操作

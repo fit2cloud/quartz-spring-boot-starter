@@ -40,17 +40,18 @@ public class QuartzManageService {
         addJob(jobDetail, trigger);
     }
 
-    public void addJob(String beanName, String methodName, Trigger trigger) throws Exception {
+    public void addJob(String beanName, String methodName, Trigger trigger, Object... params) throws Exception {
         JobDataMap jobDataMap = new JobDataMap();
         jobDataMap.put("targetObject", beanName);
         jobDataMap.put("targetMethod", methodName);
+        jobDataMap.put("params", params);
         addJob(jobDataMap, trigger);
     }
 
-    public void addJob(String beanName, String methodName, String cron) throws Exception {
-        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(beanName + methodName)
+    public void addJob(String beanName, String methodName, String cron, Object... params) throws Exception {
+        Trigger trigger = TriggerBuilder.newTrigger().withIdentity(beanName + "." + methodName)
                 .withSchedule(CronScheduleBuilder.cronSchedule(cron))
                 .build();
-        addJob(beanName, methodName, trigger);
+        addJob(beanName, methodName, trigger, params);
     }
 }

@@ -1,6 +1,7 @@
 package com.fit2cloud.autoconfigure.config;
 
 
+import com.fit2cloud.autoconfigure.util.ClassUtils;
 import com.fit2cloud.autoconfigure.util.QuartzBeanFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
@@ -23,13 +24,15 @@ public class ClusterQuartzJobBean extends QuartzJobBean {
 
     private String targetMethod;
 
+    private Object[] params;
+
     @Override
     protected void executeInternal(JobExecutionContext context) {
         try {
             logger.info("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
             Object targetObject = QuartzBeanFactory.getBean(this.targetObject);
-            Method m = targetObject.getClass().getMethod(targetMethod);
-            m.invoke(targetObject);
+            Method m = targetObject.getClass().getMethod(targetMethod, ClassUtils.toClass(params));
+            m.invoke(targetObject, params);
             logger.info("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);
         } catch (final Exception e) {
             logger.error("定时任务执行失败：targetObject=" + targetObject + ", targetMethod=" + targetMethod, e);
@@ -44,4 +47,7 @@ public class ClusterQuartzJobBean extends QuartzJobBean {
         this.targetMethod = targetMethod;
     }
 
+    public void setParams(Object... params) {
+        this.params = params;
+    }
 }

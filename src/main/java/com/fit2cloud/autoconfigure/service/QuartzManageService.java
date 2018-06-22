@@ -30,6 +30,14 @@ public class QuartzManageService {
         scheduler.rescheduleJob(triggerKey, newTrigger);
     }
 
+    public boolean checkExists(TriggerKey triggerKey) throws Exception {
+        return scheduler.checkExists(triggerKey);
+    }
+
+    public boolean checkExists(JobKey jobKey) throws Exception {
+        return scheduler.checkExists(jobKey);
+    }
+
     public void addJob(JobDetail jobDetail, Trigger trigger) throws Exception {
         scheduler.scheduleJob(jobDetail, trigger);
     }

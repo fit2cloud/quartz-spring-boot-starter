@@ -38,6 +38,10 @@ public class QuartzManageService {
         return scheduler.checkExists(jobKey);
     }
 
+    public JobKey getJobKey(TriggerKey triggerKey) throws Exception {
+        return scheduler.getTrigger(triggerKey).getJobKey();
+    }
+
     public void addJob(JobDetail jobDetail, Trigger trigger) throws Exception {
         scheduler.scheduleJob(jobDetail, trigger);
     }

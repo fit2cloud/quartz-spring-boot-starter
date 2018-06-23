@@ -62,11 +62,11 @@ public class CustomDemoJob {
     }
     /**
     * 动态调整的定时任务
-    * @param a 自定义参数 必须是包装类型
-    * @param b 自定义参数 必须是包装类型
+    * @param a 自定义参数 基本类型必须是包装类型
+    * @param b 自定义参数 必须实现 java.io.Serializable 接口
     */
-    public void task1(Integer a, Integer b) {
-        System.out.println(a + b); 
+    public void task1(Integer a, String b) {
+        System.out.printf("%d, %s\n", a, b);
     }
 }
 ```
@@ -79,9 +79,15 @@ public class TestQuartzManageService {
     private QuartzManageService quartzManageService;
 
     @Test
-    public void test1() throws Exception {
-        quartzManageService.addJob("commonJob", "task1", "1/5 * * * * ?", 3, 5);
+    public void testAddJob() throws Exception {
+        quartzManageService.addJob("commonJob", "task1", "1/5 * * * * ?", 3, "test");
         Thread.sleep(1000 * 1000);
+    } 
+    
+    @Test
+    public void testDeleteJob() throws Exception {
+        JobKey jobKey = quartzManageService.getJobKey(TriggerKey.triggerKey("commonJob" + "." + "task1"));
+        quartzManageService.deleteJob(jobKey);
     }
 }
 

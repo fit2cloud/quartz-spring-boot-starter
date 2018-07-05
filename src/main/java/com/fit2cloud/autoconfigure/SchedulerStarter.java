@@ -45,7 +45,8 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     private Instant now;
     @Resource
     private Scheduler scheduler;
-
+    @Resource
+    private TimeZone quartzTimeZone;
     private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
 
     private ConfigurableApplicationContext applicationContext;
@@ -78,7 +79,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                                 .storeDurably(true).usingJobData(jobDataMap).build();
                         trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
                                 .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
-                                .withSchedule(CronScheduleBuilder.cronSchedule(cron))
+                                .withSchedule(CronScheduleBuilder.cronSchedule(cron).inTimeZone(quartzTimeZone))
                                 .build();
                     } else if (fixedDelay > 0) {
                         jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(fixedDelay));

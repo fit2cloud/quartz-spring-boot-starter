@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.Properties;
+import java.util.TimeZone;
 
 @Configuration
 @EnableConfigurationProperties(QuartzProperties.class)
@@ -47,6 +48,12 @@ public class QuartzAutoConfiguration {
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
     public QuartzManageService quartzManageService() {
         return new QuartzManageService();
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
+    public TimeZone quartzTimeZone() {
+        return TimeZone.getTimeZone(properties.getTimeZone());
     }
 
     @Bean

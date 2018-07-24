@@ -1,8 +1,8 @@
-package com.fit2cloud.autoconfigure.config;
+package com.fit2cloud.quartz.config;
 
 
-import com.fit2cloud.autoconfigure.util.ClassUtils;
-import com.fit2cloud.autoconfigure.util.QuartzBeanFactory;
+import com.fit2cloud.quartz.util.ClassUtils;
+import com.fit2cloud.quartz.util.QuartzBeanFactory;
 import org.quartz.JobExecutionContext;
 import org.quartz.PersistJobDataAfterExecution;
 import org.slf4j.Logger;

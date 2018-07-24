@@ -1,11 +1,11 @@
-package com.fit2cloud.autoconfigure;
+package com.fit2cloud.quartz;
 
 
-import com.fit2cloud.autoconfigure.anno.QuartzScheduled;
-import com.fit2cloud.autoconfigure.config.ClusterQuartzFixedDelayJobBean;
-import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
-import com.fit2cloud.autoconfigure.config.FixedDelayJobData;
-import com.fit2cloud.autoconfigure.config.FixedDelayJobListener;
+import com.fit2cloud.quartz.anno.QuartzScheduled;
+import com.fit2cloud.quartz.config.ClusterQuartzFixedDelayJobBean;
+import com.fit2cloud.quartz.config.ClusterQuartzJobBean;
+import com.fit2cloud.quartz.config.FixedDelayJobData;
+import com.fit2cloud.quartz.config.FixedDelayJobListener;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.BeansException;

@@ -1,4 +1,4 @@
-package com.fit2cloud.autoconfigure.config;
+package com.fit2cloud.quartz.config;
 
 
 import org.quartz.DisallowConcurrentExecution;

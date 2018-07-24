@@ -1,7 +1,9 @@
 package com.fit2cloud.autoconfigure;
 
-import com.fit2cloud.autoconfigure.service.QuartzManageService;
-import com.fit2cloud.autoconfigure.util.QuartzBeanFactory;
+import com.fit2cloud.quartz.QuartzInstanceIdGenerator;
+import com.fit2cloud.quartz.SchedulerStarter;
+import com.fit2cloud.quartz.service.QuartzManageService;
+import com.fit2cloud.quartz.util.QuartzBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

@@ -1,4 +1,4 @@
-package com.fit2cloud.autoconfigure.util;
+package com.fit2cloud.quartz.util;
 
 public class ClassUtils {
     public static Class<?>[] toClass(final Object... array) {

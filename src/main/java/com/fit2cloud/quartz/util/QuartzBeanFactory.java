@@ -1,4 +1,4 @@
-package com.fit2cloud.autoconfigure.util;
+package com.fit2cloud.quartz.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

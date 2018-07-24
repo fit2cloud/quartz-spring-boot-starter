@@ -1,6 +1,6 @@
-package com.fit2cloud.autoconfigure.service;
+package com.fit2cloud.quartz.service;
 
-import com.fit2cloud.autoconfigure.config.ClusterQuartzJobBean;
+import com.fit2cloud.quartz.config.ClusterQuartzJobBean;
 import org.quartz.*;
 
 import javax.annotation.Resource;

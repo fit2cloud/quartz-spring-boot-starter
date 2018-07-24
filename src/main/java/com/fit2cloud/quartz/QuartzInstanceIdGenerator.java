@@ -1,4 +1,4 @@
-package com.fit2cloud.autoconfigure;
+package com.fit2cloud.quartz;
 
 import org.quartz.spi.InstanceIdGenerator;
 

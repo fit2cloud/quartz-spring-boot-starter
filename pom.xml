@@ -6,7 +6,7 @@
 
     <groupId>com.fit2cloud</groupId>
     <artifactId>quartz-spring-boot-starter</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4</version>
     <packaging>jar</packaging>
     <properties>
         <quartz.version>2.3.0</quartz.version>

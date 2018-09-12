@@ -66,4 +66,12 @@ public class QuartzManageService {
                 .build();
         addJob(beanName, methodName, trigger, params);
     }
+
+    public List<? extends Trigger> getTriggersOfJob(JobKey jobKey) throws Exception {
+        return scheduler.getTriggersOfJob(jobKey);
+    }
+
+    public Trigger getTrigger(TriggerKey triggerKey) throws Exception {
+        return scheduler.getTrigger(triggerKey);
+    }
 }

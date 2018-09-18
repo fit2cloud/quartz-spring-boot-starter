@@ -29,11 +29,11 @@ public class ClusterQuartzJobBean extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) {
         try {
-            logger.info("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
+            logger.debug("定时任务开始：targetObject={}, targetMethod={}", targetObject, targetMethod);
             Object targetObject = QuartzBeanFactory.getBean(this.targetObject);
             Method m = targetObject.getClass().getMethod(targetMethod, ClassUtils.toClass(params));
             m.invoke(targetObject, params);
-            logger.info("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);
+            logger.debug("定时任务正常结束：targetObject={}, targetMethod={}", this.targetObject, targetMethod);
         } catch (final Exception e) {
             logger.error("定时任务执行失败：targetObject=" + targetObject + ", targetMethod=" + targetMethod, e);
         }

@@ -130,7 +130,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                 scheduler.scheduleJob(jobDetailTrigger.jobDetail, jobDetailTrigger.trigger);
             }
             if (!scheduler.isShutdown()) {
-                scheduler.start();
+                scheduler.startDelayed(60);
             }
         } catch (SchedulerException e) {
             e.printStackTrace();

@@ -12,7 +12,6 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
     private boolean enabled = false;
     private String schedulerName;
     private String timeZone = "Asia/Shanghai";
-    private int threadCount = 10;
 
     public String getSchedulerName() {
         return schedulerName;
@@ -36,14 +35,6 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
 
     public void setTimeZone(String timeZone) {
         this.timeZone = timeZone;
-    }
-
-    public int getThreadCount() {
-        return threadCount;
-    }
-
-    public void setThreadCount(int threadCount) {
-        this.threadCount = threadCount;
     }
 
     @Override

@@ -77,8 +77,7 @@ public class QuartzAutoConfiguration {
         props.put("org.quartz.jobStore.isClustered", "true");
         props.put("org.quartz.jobStore.clusterCheckinInterval", "20000");
         props.put("org.quartz.threadPool.class", "org.quartz.simpl.SimpleThreadPool");
-        // thread count
-        props.put("org.quartz.threadPool.threadCount", this.properties.getThreadCount());
+        props.put("org.quartz.threadPool.threadCount", "10");
         props.put("org.quartz.threadPool.threadPriority", "5");
         props.put("org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread", "true");
         schedulerFactoryBean.setQuartzProperties(props);

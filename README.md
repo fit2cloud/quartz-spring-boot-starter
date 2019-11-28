@@ -92,9 +92,27 @@ public class TestQuartzManageService {
 }
 
 ``` 
+- 指定数据库连接池
+
+```java
+@Bean
+@QuartzDataSource // 指定 quartz 的数据库连接池
+public DataSource optionalDataSource() throws Exception {
+    ComboPooledDataSource dataSource = new ComboPooledDataSource();
+    dataSource.setUser(env.getProperty("optional.rdb.user"));
+    dataSource.setDriverClass(env.getProperty("optional.rdb.driver"));
+    dataSource.setPassword(env.getProperty("optional.rdb.password"));
+    dataSource.setJdbcUrl(env.getProperty("optional.rdb.url"));
+    // todo 自行添加其他参数
+    return dataSource;
+}
+
+```
 
 ## 注意事项
 - 本工程 `0.0.1` 版本不再维护
 - 本工程 `0.0.2` 版本基于JDK7编写，支持动态调整定时任务并指定参数执行修改了注解的名称和包路径
 - 本工程 `0.0.3` 版本基于JDK8编写，使用时请对照版本操作
 - 本工程 `0.0.4` 区分逻辑代码和 autoconfigure 配置
+- 本工程 `0.0.5` 可以配置 Thread pool count
+- 本工程 `0.0.6` 可以配置数据库连接池

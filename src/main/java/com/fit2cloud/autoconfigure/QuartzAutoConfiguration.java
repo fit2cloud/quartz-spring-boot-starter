@@ -2,6 +2,7 @@ package com.fit2cloud.autoconfigure;
 
 import com.fit2cloud.quartz.QuartzInstanceIdGenerator;
 import com.fit2cloud.quartz.SchedulerStarter;
+import com.fit2cloud.quartz.anno.QuartzDataSource;
 import com.fit2cloud.quartz.service.QuartzManageService;
 import com.fit2cloud.quartz.util.QuartzBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -26,8 +27,8 @@ public class QuartzAutoConfiguration {
 
     private QuartzProperties properties;
 
-    public QuartzAutoConfiguration(ObjectProvider<DataSource> dataSourceProvider, QuartzProperties properties) {
-        this.dataSource = dataSourceProvider.getIfAvailable();
+    public QuartzAutoConfiguration(DataSource dataSource, @QuartzDataSource ObjectProvider<DataSource> quartzDataSource, QuartzProperties properties) {
+        this.dataSource = getDataSource(dataSource, quartzDataSource);
         this.properties = properties;
     }
 
@@ -56,6 +57,12 @@ public class QuartzAutoConfiguration {
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
     public TimeZone quartzTimeZone() {
         return TimeZone.getTimeZone(properties.getTimeZone());
+    }
+
+    private DataSource getDataSource(DataSource dataSource,
+                                     ObjectProvider<DataSource> quartzDataSource) {
+        DataSource dataSourceIfAvailable = quartzDataSource.getIfAvailable();
+        return (dataSourceIfAvailable != null) ? dataSourceIfAvailable : dataSource;
     }
 
     @Bean

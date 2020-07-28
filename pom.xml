@@ -8,10 +8,40 @@
     <artifactId>quartz-spring-boot-starter</artifactId>
     <version>0.0.4</version>
     <packaging>jar</packaging>
+
+    <name>quartz-spring-boot-starter</name>
+    <url>https://github.com/fit2cloud/quartz-spring-boot-starter</url>
+    <description>quartz spring boot starter</description>
+
     <properties>
         <quartz.version>2.3.0</quartz.version>
         <java.version>1.8</java.version>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <scm>
+        <connection>scm:git:https://github.com/fit2cloud/quartz-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:https://github.com/fit2cloud/quartz-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/fit2cloud/quartz-spring-boot-starter</url>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>liuruibin</name>
+            <email>bin@fit2cloud.com</email>
+            <organization>http://fit2cloud.com</organization>
+        </developer>
+    </developers>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -49,6 +79,31 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -115,14 +170,9 @@
     </pluginRepositories>
     <distributionManagement>
         <repository>
-            <id>releases</id>
-            <name>Nexus Release Repository</name>
-            <url>http://repository.fit2cloud.com/content/repositories/releases/</url>
+            <id>oss-sonatype</id>
+            <name>OSS sonatype Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
         </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Nexus Snapshot Repository</name>
-            <url>http://repository.fit2cloud.com/content/repositories/snapshots/</url>
-        </snapshotRepository>
     </distributionManagement>
 </project>

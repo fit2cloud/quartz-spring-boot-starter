@@ -107,6 +107,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <!-- 寻找 setting.xml 里配置的密码¬-->
+                <configuration>
+                    <gpgArguments>
+                        <arg>--pinentry-mode</arg>
+                        <arg>loopback</arg>
+                    </gpgArguments>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

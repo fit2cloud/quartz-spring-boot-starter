@@ -6,9 +6,11 @@ import com.fit2cloud.quartz.anno.QuartzDataSource;
 import com.fit2cloud.quartz.service.QuartzManageService;
 import com.fit2cloud.quartz.util.QuartzBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +23,7 @@ import java.util.TimeZone;
 
 @Configuration
 @EnableConfigurationProperties(QuartzProperties.class)
-@ConditionalOnBean(DataSource.class)
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class QuartzAutoConfiguration {
     private DataSource dataSource;
 
@@ -66,7 +68,7 @@ public class QuartzAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnBean(DataSource.class)
+    @ConditionalOnClass(DataSource.class)
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
     public SchedulerFactoryBean clusterSchedulerFactoryBean() {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();

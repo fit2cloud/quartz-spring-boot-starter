@@ -80,7 +80,7 @@ public class QuartzAutoConfiguration {
         props.put("org.quartz.scheduler.instanceName", "clusterScheduler");
         props.put("org.quartz.scheduler.instanceId", "AUTO"); // 集群下的instanceId 必须唯一
         props.put("org.quartz.scheduler.instanceIdGenerator.class", QuartzInstanceIdGenerator.class.getName());// instanceId 生成的方式
-        props.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+//        props.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX"); // spring boot 2.6 中不需要设置这个值，datasource自己决定
         props.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         props.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
         props.put("org.quartz.jobStore.isClustered", "true");

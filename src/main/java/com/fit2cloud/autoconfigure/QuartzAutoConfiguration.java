@@ -15,9 +15,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
+import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -91,6 +93,12 @@ public class QuartzAutoConfiguration {
         props.put("org.quartz.threadPool.threadCount", threadCount);
         props.put("org.quartz.threadPool.threadPriority", "5");
         props.put("org.quartz.threadPool.threadsInheritContextClassLoaderOfInitializingThread", "true");
+        // 外部传入的属性优先级更高
+        Map<String, String> properties = this.properties.getProperties();
+        if (!CollectionUtils.isEmpty(properties)) {
+            props.putAll(properties);
+        }
+
         schedulerFactoryBean.setQuartzProperties(props);
         if (!StringUtils.isEmpty(this.properties.getSchedulerName())) {
             schedulerFactoryBean.setBeanName(this.properties.getSchedulerName());

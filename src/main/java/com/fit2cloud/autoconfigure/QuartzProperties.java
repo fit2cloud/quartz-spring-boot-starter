@@ -5,6 +5,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.core.env.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 @ConfigurationProperties(prefix = "quartz", ignoreUnknownFields = true)
 public class QuartzProperties implements EnvironmentAware, InitializingBean {
@@ -13,6 +16,7 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
     private String schedulerName;
     private String timeZone = "Asia/Shanghai";
     private Integer threadCount = 10;
+    private final Map<String, String> properties = new HashMap<>();
 
     public String getSchedulerName() {
         return schedulerName;
@@ -44,6 +48,10 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
 
     public void setThreadCount(Integer threadCount) {
         this.threadCount = threadCount;
+    }
+
+    public Map<String, String> getProperties() {
+        return this.properties;
     }
 
     @Override

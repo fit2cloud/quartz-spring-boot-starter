@@ -23,8 +23,8 @@
 ```xml
 <dependency>
   <groupId>com.fit2cloud</groupId>
-  <artifactId>quartz-spring-boot-starter</artifactId>
-  <version>0.0.4</version>
+    <artifactId>quartz-spring-boot-starter</artifactId>
+    <version>0.0.9</version>
 </dependency>
 ```
 - 工程启动的配置文件`application.properties`中有定时任务的详细设置

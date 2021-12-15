@@ -7,8 +7,6 @@
 
 ## 前言
 
-涵盖范围：
-
 - 本工程对刚接触FIT2CLOUD的同学，以及具有多年经验的老司机都有用处。本工程致力于做到*覆盖面广*（尽量包括一切重要的内容），*具体*（给出最常见的具体的例子），以及*简洁*（避免不必要的，或是可以在其他地方轻松查到的细枝末节）。每个技巧在特定情境下或是基本的，或是能显著节约时间。
 - 本文主要介绍工程的入门使用和注意事项。
 - 本文为 OS X 所写，并适用于 Windows 和 Linux 。
@@ -32,6 +30,7 @@
 # quartz enabled
 quartz.enabled=true # 是否开启quartz
 quartz.scheduler-name=testScheduler # 集群定时任务的唯一标识
+quartz.properties.org.quartz.jobStore.acquireTriggersWithinLock=true # 配置额外的properties
 ```
 - 工程中代码只需要在 `public method` 中加上指定注解即可
 ```java

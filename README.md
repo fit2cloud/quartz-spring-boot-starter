@@ -116,3 +116,6 @@ public DataSource optionalDataSource() throws Exception {
 - 本工程 `0.0.4` 区分逻辑代码和 autoconfigure 配置
 - 本工程 `0.0.5` 可以配置 Thread pool count
 - 本工程 `0.0.6` 可以配置数据库连接池
+- 本工程 `0.0.7` 修改了自动配置非功能代码
+- 本工程 `0.0.8` 升级quartz依赖的版本
+- 本工程 `0.0.9` 可以传入自定义的`quartz.properties`

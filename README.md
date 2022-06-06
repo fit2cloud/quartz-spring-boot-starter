@@ -118,3 +118,4 @@ public DataSource optionalDataSource() throws Exception {
 - 本工程 `0.0.7` 修改了自动配置非功能代码
 - 本工程 `0.0.8` 升级quartz依赖的版本
 - 本工程 `0.0.9` 可以传入自定义的`quartz.properties`
+- 本工程 `1.0.0` 扩展spring-boot-quartz，并将依赖版本提升至2.7.0

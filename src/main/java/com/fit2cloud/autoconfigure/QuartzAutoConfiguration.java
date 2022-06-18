@@ -12,11 +12,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -72,17 +72,16 @@ public class QuartzAutoConfiguration {
     @Bean
     @ConditionalOnClass(DataSource.class)
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
-    public SchedulerFactoryBean clusterSchedulerFactoryBean() {
+    public SchedulerFactoryBean clusterSchedulerFactoryBean(ApplicationContext applicationContext) {
         SchedulerFactoryBean schedulerFactoryBean = new SchedulerFactoryBean();
         schedulerFactoryBean.setDataSource(this.dataSource);
-        schedulerFactoryBean.setApplicationContextSchedulerContextKey("applicationContextKey");
+        schedulerFactoryBean.setApplicationContext(applicationContext);
         schedulerFactoryBean.setOverwriteExistingJobs(true);
-        schedulerFactoryBean.setStartupDelay(60);// 60 秒之后开始执行定时任务
+        schedulerFactoryBean.setStartupDelay((int) properties.getStartupDelay().getSeconds());
         Properties props = new Properties();
         props.put("org.quartz.scheduler.instanceName", "clusterScheduler");
         props.put("org.quartz.scheduler.instanceId", "AUTO"); // 集群下的instanceId 必须唯一
         props.put("org.quartz.scheduler.instanceIdGenerator.class", QuartzInstanceIdGenerator.class.getName());// instanceId 生成的方式
-//        props.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX"); // spring boot 2.6 中不需要设置这个值，datasource自己决定
         props.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");
         props.put("org.quartz.jobStore.tablePrefix", "QRTZ_");
         props.put("org.quartz.jobStore.isClustered", "true");
@@ -100,7 +99,7 @@ public class QuartzAutoConfiguration {
         }
 
         schedulerFactoryBean.setQuartzProperties(props);
-        if (!StringUtils.isEmpty(this.properties.getSchedulerName())) {
+        if (this.properties.getSchedulerName() != null) {
             schedulerFactoryBean.setBeanName(this.properties.getSchedulerName());
         }
         return schedulerFactoryBean;

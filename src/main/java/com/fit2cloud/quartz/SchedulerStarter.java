@@ -119,13 +119,6 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     @EventListener
     public void startScheduler(ContextRefreshedEvent event) throws BeansException {
         try {
-            scheduler.deleteJobs(getJobKeys());
-            scheduler.unscheduleJobs(getTriggerKeys());
-            scheduler.getListenerManager().addJobListener(new FixedDelayJobListener());
-            for (String jobDetailIdentity : jobDetailTriggerMap.keySet()) {
-                JobDetailTrigger jobDetailTrigger = this.jobDetailTriggerMap.get(jobDetailIdentity);
-                scheduler.scheduleJob(jobDetailTrigger.jobDetail, jobDetailTrigger.trigger);
-            }
             if (!scheduler.isShutdown()) {
                 // Not using the Quartz startDelayed method since we explicitly want a daemon
                 // thread here, not keeping the JVM alive in case of all other threads ending.
@@ -138,6 +131,13 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         // simply proceed
                     }
                     try {
+                        scheduler.deleteJobs(getJobKeys());
+                        scheduler.unscheduleJobs(getTriggerKeys());
+                        scheduler.getListenerManager().addJobListener(new FixedDelayJobListener());
+                        for (String jobDetailIdentity : jobDetailTriggerMap.keySet()) {
+                            JobDetailTrigger jobDetailTrigger = this.jobDetailTriggerMap.get(jobDetailIdentity);
+                            scheduler.scheduleJob(jobDetailTrigger.jobDetail, jobDetailTrigger.trigger);
+                        }
                         scheduler.start();
                     } catch (SchedulerException ex) {
                         throw new SchedulingException("Could not start Quartz Scheduler after delay", ex);

@@ -79,7 +79,7 @@ public class QuartzAutoConfiguration {
         schedulerFactoryBean.setOverwriteExistingJobs(true);
         schedulerFactoryBean.setStartupDelay((int) properties.getStartupDelay().getSeconds());
         Properties props = new Properties();
-        props.put("org.quartz.scheduler.instanceName", "clusterScheduler");
+        props.put("org.quartz.scheduler.instanceName", properties.getSchedulerName());
         props.put("org.quartz.scheduler.instanceId", "AUTO"); // 集群下的instanceId 必须唯一
         props.put("org.quartz.scheduler.instanceIdGenerator.class", QuartzInstanceIdGenerator.class.getName());// instanceId 生成的方式
         props.put("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate");

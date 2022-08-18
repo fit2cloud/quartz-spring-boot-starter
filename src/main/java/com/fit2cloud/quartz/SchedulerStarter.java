@@ -11,13 +11,15 @@ import com.fit2cloud.quartz.service.QuartzManageService;
 import com.fit2cloud.quartz.util.JobDetailTrigger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.SchedulingException;
 import org.springframework.util.ReflectionUtils;
@@ -45,7 +47,8 @@ import java.util.concurrent.TimeUnit;
  * 10. @EventListener ContextRefreshedEvent
  * </pre>
  */
-public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAware {
+public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAware, ApplicationRunner {
+    private Logger logger = LoggerFactory.getLogger(SchedulerStarter.class);
     private Instant now;
     @Resource
     private Scheduler scheduler;
@@ -118,40 +121,6 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     }
 
     /**
-     * spring 完全刷新之后执行
-     */
-    @EventListener
-    public void startScheduler(ContextRefreshedEvent event) throws BeansException {
-        try {
-            if (!scheduler.isShutdown()) {
-                // Not using the Quartz startDelayed method since we explicitly want a daemon
-                // thread here, not keeping the JVM alive in case of all other threads ending.
-                Thread schedulerThread = new Thread(() -> {
-                    try {
-                        QuartzProperties quartzProperties = event.getApplicationContext().getBean(QuartzProperties.class);
-                        TimeUnit.SECONDS.sleep(quartzProperties.getStartupDelay().getSeconds());
-                    } catch (InterruptedException ex) {
-                        Thread.currentThread().interrupt();
-                        // simply proceed
-                    }
-                    try {
-                        quartzManageService.rescheduleJobs(getJobKeys(), getTriggerKeys(), jobDetailTriggerMap);
-                        scheduler.start();
-                    } catch (Exception ex) {
-                        throw new SchedulingException("Could not start Quartz Scheduler after delay", ex);
-                    }
-                });
-                schedulerThread.setName("Quartz Scheduler [" + scheduler.getSchedulerName() + "]");
-                schedulerThread.setDaemon(true);
-                schedulerThread.start();
-            }
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
      * 获取数据库中的所有JobKey
      */
     private List<JobKey> getJobKeys() throws SchedulerException {
@@ -184,4 +153,38 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
         this.applicationContext = (ConfigurableApplicationContext) applicationContext;
     }
 
+    /**
+     * spring 完全刷新之后执行
+     */
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
+        try {
+            if (!scheduler.isShutdown()) {
+                // Not using the Quartz startDelayed method since we explicitly want a daemon
+                // thread here, not keeping the JVM alive in case of all other threads ending.
+                Thread schedulerThread = new Thread(() -> {
+                    try {
+                        QuartzProperties quartzProperties = this.applicationContext.getBean(QuartzProperties.class);
+                        TimeUnit.SECONDS.sleep(quartzProperties.getStartupDelay().getSeconds());
+                    } catch (InterruptedException ex) {
+                        Thread.currentThread().interrupt();
+                        // simply proceed
+                    }
+                    try {
+                        // init all jobs
+                        logger.info("reschedule all jobs...");
+                        quartzManageService.rescheduleJobs(getJobKeys(), getTriggerKeys(), jobDetailTriggerMap);
+                        scheduler.start();
+                    } catch (Exception ex) {
+                        throw new SchedulingException("Could not start Quartz Scheduler after delay", ex);
+                    }
+                });
+                schedulerThread.setName("Quartz Scheduler [" + scheduler.getSchedulerName() + "]");
+                schedulerThread.setDaemon(true);
+                schedulerThread.start();
+            }
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
 }

@@ -7,6 +7,8 @@ import com.fit2cloud.quartz.config.ClusterQuartzFixedDelayJobBean;
 import com.fit2cloud.quartz.config.ClusterQuartzJobBean;
 import com.fit2cloud.quartz.config.FixedDelayJobData;
 import com.fit2cloud.quartz.config.FixedDelayJobListener;
+import com.fit2cloud.quartz.service.QuartzManageService;
+import com.fit2cloud.quartz.util.JobDetailTrigger;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.beans.BeansException;
@@ -52,6 +54,8 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
 
     private ConfigurableApplicationContext applicationContext;
+    @Resource
+    private QuartzManageService quartzManageService;
 
     @Override
     public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
@@ -131,15 +135,9 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         // simply proceed
                     }
                     try {
-                        scheduler.deleteJobs(getJobKeys());
-                        scheduler.unscheduleJobs(getTriggerKeys());
-                        scheduler.getListenerManager().addJobListener(new FixedDelayJobListener());
-                        for (String jobDetailIdentity : jobDetailTriggerMap.keySet()) {
-                            JobDetailTrigger jobDetailTrigger = this.jobDetailTriggerMap.get(jobDetailIdentity);
-                            scheduler.scheduleJob(jobDetailTrigger.jobDetail, jobDetailTrigger.trigger);
-                        }
+                        quartzManageService.rescheduleJobs(getJobKeys(), getTriggerKeys(), jobDetailTriggerMap);
                         scheduler.start();
-                    } catch (SchedulerException ex) {
+                    } catch (Exception ex) {
                         throw new SchedulingException("Could not start Quartz Scheduler after delay", ex);
                     }
                 });
@@ -186,13 +184,4 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
         this.applicationContext = (ConfigurableApplicationContext) applicationContext;
     }
 
-    private static class JobDetailTrigger {
-        JobDetail jobDetail;
-        Trigger trigger;
-
-        JobDetailTrigger(JobDetail jobDetail, Trigger trigger) {
-            this.jobDetail = jobDetail;
-            this.trigger = trigger;
-        }
-    }
 }

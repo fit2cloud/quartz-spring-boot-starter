@@ -1,10 +1,14 @@
 package com.fit2cloud.quartz.service;
 
 import com.fit2cloud.quartz.config.ClusterQuartzJobBean;
+import com.fit2cloud.quartz.config.FixedDelayJobListener;
+import com.fit2cloud.quartz.util.JobDetailTrigger;
 import org.quartz.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
 public class QuartzManageService {
     @Resource
@@ -73,5 +77,17 @@ public class QuartzManageService {
 
     public Trigger getTrigger(TriggerKey triggerKey) throws Exception {
         return scheduler.getTrigger(triggerKey);
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
+    public void rescheduleJobs(List<JobKey> jobs, List<TriggerKey> triggers, Map<String, JobDetailTrigger> jobDetailTriggerMap) throws Exception {
+        scheduler.deleteJobs(jobs);
+        scheduler.unscheduleJobs(triggers);
+        scheduler.getListenerManager().addJobListener(new FixedDelayJobListener());
+        for (String jobDetailIdentity : jobDetailTriggerMap.keySet()) {
+            JobDetailTrigger jobDetailTrigger = jobDetailTriggerMap.get(jobDetailIdentity);
+            scheduler.scheduleJob(jobDetailTrigger.getJobDetail(), jobDetailTrigger.getTrigger());
+        }
     }
 }

@@ -81,7 +81,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                 final JobDetail jobDetail;
                 final Trigger trigger;
                 String jobDetailIdentity = beanName + "." + method.getName();
-                if (cron != null) {
+                if (cron != null && !"".equals(cron)) {
                     cron = getCronExpression(cron);
                     jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                             .storeDurably(true).usingJobData(jobDataMap).build();

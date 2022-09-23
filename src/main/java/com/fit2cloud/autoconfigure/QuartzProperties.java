@@ -19,6 +19,7 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
     private Integer threadCount = 10;
 
     private Duration startupDelay = Duration.ofSeconds(60);
+    private String groupName = "DEFAULT";
 
     private final Map<String, String> properties = new HashMap<>();
 
@@ -57,6 +58,15 @@ public class QuartzProperties implements EnvironmentAware, InitializingBean {
 
     public Duration getStartupDelay() {
         return this.startupDelay;
+    }
+
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public void setStartupDelay(Duration startupDelay) {

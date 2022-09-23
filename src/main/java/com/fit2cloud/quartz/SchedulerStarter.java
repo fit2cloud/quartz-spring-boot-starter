@@ -49,11 +49,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAware, ApplicationRunner {
     private Logger logger = LoggerFactory.getLogger(SchedulerStarter.class);
+
     private Instant now;
     @Resource
     private Scheduler scheduler;
     @Resource
     private TimeZone quartzTimeZone;
+    @Resource
+    private QuartzProperties quartzProperties;
     private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
 
     private ConfigurableApplicationContext applicationContext;
@@ -85,7 +88,7 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                     cron = getCronExpression(cron);
                     jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                             .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
+                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
                             .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                             .withSchedule(CronScheduleBuilder.cronSchedule(cron).inTimeZone(quartzTimeZone))
                             .build();
@@ -93,14 +96,14 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                     jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(fixedDelay));
                     jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
                             .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
+                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
                             .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                             .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(fixedDelay).repeatForever())
                             .build();
                 } else {
                     jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
                             .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(jobDetailIdentity)
+                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
                             .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
                             .withSchedule(SimpleScheduleBuilder.simpleSchedule()
                                     .withIntervalInMilliseconds(fixedRate).repeatForever())
@@ -124,24 +127,14 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
      * 获取数据库中的所有JobKey
      */
     private List<JobKey> getJobKeys() throws SchedulerException {
-        List<String> jobGroupNames = scheduler.getJobGroupNames();
-        List<JobKey> jobKeys = new ArrayList<>();
-        for (String jobGroupName : jobGroupNames) {
-            jobKeys.addAll(scheduler.getJobKeys(GroupMatcher.jobGroupEquals(jobGroupName)));
-        }
-        return jobKeys;
+        return new ArrayList<>(scheduler.getJobKeys(GroupMatcher.jobGroupEquals(quartzProperties.getGroupName())));
     }
 
     /**
      * 获取数据库中的所有TriggerKey
      */
     private List<TriggerKey> getTriggerKeys() throws SchedulerException {
-        List<String> triggerGroupNames = scheduler.getJobGroupNames();
-        List<TriggerKey> triggerKeys = new ArrayList<>();
-        for (String triggerGroupName : triggerGroupNames) {
-            triggerKeys.addAll(scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroupName)));
-        }
-        return triggerKeys;
+        return new ArrayList<>(scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(quartzProperties.getGroupName())));
     }
 
     /**

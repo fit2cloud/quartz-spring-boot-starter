@@ -4,14 +4,14 @@ import com.fit2cloud.quartz.config.ClusterQuartzJobBean;
 import com.fit2cloud.quartz.config.FixedDelayJobListener;
 import com.fit2cloud.quartz.util.JobDetailTrigger;
 import org.quartz.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 public class QuartzManageService {
-    @Resource
+    @Autowired
     private Scheduler scheduler;
 
     public List<JobExecutionContext> getCurrentlyExecutingJobs() throws Exception {

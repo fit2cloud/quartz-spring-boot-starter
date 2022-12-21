@@ -14,6 +14,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -24,7 +25,6 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.scheduling.SchedulingException;
 import org.springframework.util.ReflectionUtils;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.*;
@@ -51,16 +51,16 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
     private Logger logger = LoggerFactory.getLogger(SchedulerStarter.class);
 
     private Instant now;
-    @Resource
+    @Autowired
     private Scheduler scheduler;
-    @Resource
+    @Autowired
     private TimeZone quartzTimeZone;
-    @Resource
+    @Autowired
     private QuartzProperties quartzProperties;
     private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
 
     private ConfigurableApplicationContext applicationContext;
-    @Resource
+    @Autowired
     private QuartzManageService quartzManageService;
 
     @Override

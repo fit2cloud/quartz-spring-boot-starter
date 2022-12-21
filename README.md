@@ -22,7 +22,7 @@
 <dependency>
   <groupId>com.fit2cloud</groupId>
     <artifactId>quartz-spring-boot-starter</artifactId>
-    <version>0.0.9</version>
+    <version>1.0.7</version>
 </dependency>
 ```
 - 工程启动的配置文件`application.properties`中有定时任务的详细设置

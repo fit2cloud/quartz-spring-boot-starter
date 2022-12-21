@@ -74,7 +74,7 @@ public class CustomDemoJob {
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TestQuartzManageService {
-    @Resource
+    @Autowired
     private QuartzManageService quartzManageService;
 
     @Test
@@ -119,3 +119,4 @@ public DataSource optionalDataSource() throws Exception {
 - 本工程 `0.0.8` 升级quartz依赖的版本
 - 本工程 `0.0.9` 可以传入自定义的`quartz.properties`
 - 本工程 `1.0.0` 扩展spring-boot-quartz，并将依赖版本提升至2.7.0
+- 本工程 `1.0.7` 使用@Autowired注入，兼容spring boot 3.x和2.x 

@@ -3,6 +3,7 @@ package com.fit2cloud.autoconfigure;
 import com.fit2cloud.quartz.QuartzInstanceIdGenerator;
 import com.fit2cloud.quartz.SchedulerStarter;
 import com.fit2cloud.quartz.anno.QuartzDataSource;
+import com.fit2cloud.quartz.anno.QuartzTransactionManager;
 import com.fit2cloud.quartz.service.QuartzManageService;
 import com.fit2cloud.quartz.util.QuartzBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -16,6 +17,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.CollectionUtils;
 
 import javax.sql.DataSource;
@@ -28,11 +30,15 @@ import java.util.TimeZone;
 @AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class QuartzAutoConfiguration {
     private DataSource dataSource;
+    private PlatformTransactionManager txManager;
 
     private QuartzProperties properties;
 
-    public QuartzAutoConfiguration(DataSource dataSource, @QuartzDataSource ObjectProvider<DataSource> quartzDataSource, QuartzProperties properties) {
+    public QuartzAutoConfiguration(DataSource dataSource, @QuartzDataSource ObjectProvider<DataSource> quartzDataSource,
+                                   ObjectProvider<PlatformTransactionManager> transactionManager, @QuartzTransactionManager ObjectProvider<PlatformTransactionManager> quartzTransactionManager,
+                                   QuartzProperties properties) {
         this.dataSource = getDataSource(dataSource, quartzDataSource);
+        this.txManager = getTransactionManager(transactionManager, quartzTransactionManager);
         this.properties = properties;
     }
 
@@ -69,6 +75,16 @@ public class QuartzAutoConfiguration {
         return (dataSourceIfAvailable != null) ? dataSourceIfAvailable : dataSource;
     }
 
+
+    private PlatformTransactionManager getTransactionManager(
+            ObjectProvider<PlatformTransactionManager> transactionManager,
+            ObjectProvider<PlatformTransactionManager> quartzTransactionManager) {
+        PlatformTransactionManager transactionManagerIfAvailable = quartzTransactionManager.getIfAvailable();
+        return (transactionManagerIfAvailable != null) ? transactionManagerIfAvailable
+                : transactionManager.getIfUnique();
+    }
+
+
     @Bean
     @ConditionalOnClass(DataSource.class)
     @ConditionalOnProperty(prefix = "quartz", value = "enabled", havingValue = "true")
@@ -101,6 +117,9 @@ public class QuartzAutoConfiguration {
         schedulerFactoryBean.setQuartzProperties(props);
         if (this.properties.getSchedulerName() != null) {
             schedulerFactoryBean.setBeanName(this.properties.getSchedulerName());
+        }
+        if (txManager != null) {
+            schedulerFactoryBean.setTransactionManager(txManager);
         }
         return schedulerFactoryBean;
     }

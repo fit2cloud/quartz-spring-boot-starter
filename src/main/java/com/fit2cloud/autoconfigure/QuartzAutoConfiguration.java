@@ -6,28 +6,28 @@ import com.fit2cloud.quartz.anno.QuartzDataSource;
 import com.fit2cloud.quartz.anno.QuartzTransactionManager;
 import com.fit2cloud.quartz.service.QuartzManageService;
 import com.fit2cloud.quartz.util.QuartzBeanFactory;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.CollectionUtils;
 
-import javax.sql.DataSource;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TimeZone;
 
-@Configuration
+@AutoConfiguration(after = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(QuartzProperties.class)
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class QuartzAutoConfiguration {
     private DataSource dataSource;
     private PlatformTransactionManager txManager;

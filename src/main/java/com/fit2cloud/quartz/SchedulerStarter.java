@@ -29,6 +29,7 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 /**
  * 这里必须用 ApplicationContextAware,
@@ -50,14 +51,14 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAware, ApplicationRunner {
     private Logger logger = LoggerFactory.getLogger(SchedulerStarter.class);
 
-    private Instant now;
     @Autowired
     private Scheduler scheduler;
     @Autowired
     private TimeZone quartzTimeZone;
     @Autowired
     private QuartzProperties quartzProperties;
-    private Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
+    // Stores lazy suppliers so triggers are built with a fresh Instant.now() at actual schedule time
+    private Map<String, Supplier<JobDetailTrigger>> jobDetailTriggerSupplierMap = new HashMap<>();
 
     private ConfigurableApplicationContext applicationContext;
     @Autowired
@@ -74,42 +75,56 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
         for (Method method : methods) {
             QuartzScheduled annotation = AnnotationUtils.findAnnotation(method, QuartzScheduled.class);
             if (annotation != null) {
-                JobDataMap jobDataMap = new JobDataMap();
-                jobDataMap.put("targetObject", beanName);
-                jobDataMap.put("targetMethod", method.getName());
-                String cron = annotation.cron();
+                String resolvedCron = annotation.cron() != null && !annotation.cron().isEmpty()
+                        ? getCronExpression(annotation.cron()) : null;
                 long fixedDelay = annotation.fixedDelay();
                 long fixedRate = annotation.fixedRate();
-                int initialDelay = (int) annotation.initialDelay();
-                final JobDetail jobDetail;
-                final Trigger trigger;
+                long initialDelay = annotation.initialDelay();
                 String jobDetailIdentity = beanName + "." + method.getName();
-                if (cron != null && !"".equals(cron)) {
-                    cron = getCronExpression(cron);
-                    jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
-                            .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
-                            .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
-                            .withSchedule(CronScheduleBuilder.cronSchedule(cron).inTimeZone(quartzTimeZone))
-                            .build();
-                } else if (fixedDelay > 0) {
-                    jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(fixedDelay));
-                    jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
-                            .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
-                            .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
-                            .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInMilliseconds(fixedDelay).repeatForever())
-                            .build();
-                } else {
-                    jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
-                            .storeDurably(true).usingJobData(jobDataMap).build();
-                    trigger = TriggerBuilder.newTrigger().withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
-                            .startAt(new Date(now.plusMillis(initialDelay).toEpochMilli()))
-                            .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                                    .withIntervalInMilliseconds(fixedRate).repeatForever())
-                            .build();
-                }
-                jobDetailTriggerMap.put(jobDetailIdentity, new JobDetailTrigger(jobDetail, trigger));
+
+                // Build the trigger lazily at actual schedule time so startAt uses a fresh Instant.now()
+                jobDetailTriggerSupplierMap.put(jobDetailIdentity, () -> {
+                    Instant scheduleTime = Instant.now();
+                    JobDataMap jobDataMap = new JobDataMap();
+                    jobDataMap.put("targetObject", beanName);
+                    jobDataMap.put("targetMethod", method.getName());
+                    final JobDetail jobDetail;
+                    final Trigger trigger;
+                    if (resolvedCron != null && !resolvedCron.isEmpty()) {
+                        jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
+                                .storeDurably(true).usingJobData(jobDataMap).build();
+                        trigger = TriggerBuilder.newTrigger()
+                                .withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
+                                .startAt(new Date(scheduleTime.plusMillis(initialDelay).toEpochMilli()))
+                                .withSchedule(CronScheduleBuilder.cronSchedule(resolvedCron)
+                                        .inTimeZone(quartzTimeZone)
+                                        // Skip missed fires instead of replaying them after downtime
+                                        .withMisfireHandlingInstructionDoNothing())
+                                .build();
+                    } else if (fixedDelay > 0) {
+                        jobDataMap.put(FixedDelayJobListener.FIXED_DELAY_JOB_DATA, new FixedDelayJobData(fixedDelay));
+                        jobDetail = JobBuilder.newJob(ClusterQuartzFixedDelayJobBean.class)
+                                .storeDurably(true).usingJobData(jobDataMap).build();
+                        trigger = TriggerBuilder.newTrigger()
+                                .withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
+                                .startAt(new Date(scheduleTime.plusMillis(initialDelay).toEpochMilli()))
+                                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                                        .withIntervalInMilliseconds(fixedDelay).repeatForever()
+                                        .withMisfireHandlingInstructionNextWithExistingCount())
+                                .build();
+                    } else {
+                        jobDetail = JobBuilder.newJob(ClusterQuartzJobBean.class)
+                                .storeDurably(true).usingJobData(jobDataMap).build();
+                        trigger = TriggerBuilder.newTrigger()
+                                .withIdentity(TriggerKey.triggerKey(jobDetailIdentity, quartzProperties.getGroupName()))
+                                .startAt(new Date(scheduleTime.plusMillis(initialDelay).toEpochMilli()))
+                                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                                        .withIntervalInMilliseconds(fixedRate).repeatForever()
+                                        .withMisfireHandlingInstructionNextWithExistingCount())
+                                .build();
+                    }
+                    return new JobDetailTrigger(jobDetail, trigger);
+                });
             }
         }
         return bean;
@@ -142,7 +157,6 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
      */
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        now = Instant.now();
         this.applicationContext = (ConfigurableApplicationContext) applicationContext;
     }
 
@@ -164,6 +178,11 @@ public class SchedulerStarter implements BeanPostProcessor, ApplicationContextAw
                         // simply proceed
                     }
                     try {
+                        // Evaluate trigger suppliers now so startAt reflects the actual schedule time
+                        Map<String, JobDetailTrigger> jobDetailTriggerMap = new HashMap<>();
+                        for (Map.Entry<String, Supplier<JobDetailTrigger>> entry : jobDetailTriggerSupplierMap.entrySet()) {
+                            jobDetailTriggerMap.put(entry.getKey(), entry.getValue().get());
+                        }
                         // init all jobs
                         logger.info("reschedule all jobs...");
                         quartzManageService.rescheduleJobs(getJobKeys(), getTriggerKeys(), jobDetailTriggerMap);
